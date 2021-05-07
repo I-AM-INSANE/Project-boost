@@ -7,6 +7,9 @@ public class Player_Movement : MonoBehaviour
 {
     #region Fields
 
+    [SerializeField] private ParticleSystem mainEngineParticles;
+    [SerializeField] private ParticleSystem leftEngineParticles;
+    [SerializeField] private ParticleSystem rightEngineParticles;
     [SerializeField] private float boost;
     [SerializeField] private float rotateSpeed;
     private Rigidbody rb;
@@ -30,28 +33,48 @@ public class Player_Movement : MonoBehaviour
     {
         horizontalAxisValue = Input.GetAxis("Horizontal");
         jumpAxisValue = Input.GetAxis("Jump");
-        AddRotation();
+        ProcessRotation();
     }
 
     private void FixedUpdate()
     {
-        AddBoost();
+        ProcessBoost();
     }
 
-    private void AddRotation()
+    private void ProcessRotation()
     {
         rb.constraints = RigidbodyConstraints.FreezeRotationZ;
-        transform.Rotate(Vector3.forward * horizontalAxisValue * rotateSpeed * Time.deltaTime);
+        transform.Rotate(Vector3.forward * -horizontalAxisValue * rotateSpeed * Time.deltaTime);
         rb.constraints = originalConstraints;
+        if (horizontalAxisValue > 0)
+        {
+            if (!leftEngineParticles.isPlaying)
+                leftEngineParticles.Play();
+        }
+        else if (horizontalAxisValue < 0)
+        {
+            if (!rightEngineParticles.isPlaying)
+                rightEngineParticles.Play();
+        }
+        else
+        {
+            leftEngineParticles.Stop();
+            rightEngineParticles.Stop();
+        }
+        
     }
 
-    private void AddBoost()
+    private void ProcessBoost()
     {
         BoostAudioEffect();
         if (jumpAxisValue != 0)
         {
             rb.AddRelativeForce(Vector3.up * jumpAxisValue * boost * Time.fixedDeltaTime);
+            if (!mainEngineParticles.isPlaying)
+                mainEngineParticles.Play();
         }
+        else
+            mainEngineParticles.Stop();
 
     }
     private void BoostAudioEffect()

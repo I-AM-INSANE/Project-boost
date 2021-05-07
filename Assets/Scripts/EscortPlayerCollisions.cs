@@ -5,6 +5,8 @@ using UnityEngine;
 public class EscortPlayerCollisions : MonoBehaviour
 {
     [SerializeField] private float LevelLoadDelay;
+    [SerializeField] private ParticleSystem crashParticles;
+    [SerializeField] private ParticleSystem finishParticles;
     private AudioSource audioSource;
     private bool isTransitioning = false;
 
@@ -32,6 +34,7 @@ public class EscortPlayerCollisions : MonoBehaviour
     {
         isTransitioning = true;
         DisablePlayerMovement();
+        crashParticles.Play();
         PlaySoundEffect(AudioStorage.Instance.SFX_SpaceShip_Death);
         yield return new WaitForSeconds(LevelLoadDelay);
         LevelManager.ReloadLevel();
@@ -41,9 +44,10 @@ public class EscortPlayerCollisions : MonoBehaviour
     {
         isTransitioning = true;
         DisablePlayerMovement();
+        finishParticles.Play();
         PlaySoundEffect(AudioStorage.Instance.SFX_Finish);
         yield return new WaitForSeconds(LevelLoadDelay);
-        LevelManager.ReloadLevel();
+        LevelManager.LoadNextLevel();
     }
 
     private void PlaySoundEffect(AudioClip clip)
