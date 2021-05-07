@@ -6,6 +6,7 @@ public class EscortPlayerCollisions : MonoBehaviour
 {
     [SerializeField] private float LevelLoadDelay;
     private AudioSource audioSource;
+    private bool isTransitioning = false;
 
     private void Awake()
     {
@@ -14,30 +15,41 @@ public class EscortPlayerCollisions : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+        if (!isTransitioning)
         {
-            StartCoroutine(CrashRoutine());
-        }
-        else if (collision.gameObject.CompareTag("Finish"))
-        {
-            StartCoroutine(FinishRoutine());
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
+            {
+                StartCoroutine(CrashRoutine());
+            }
+            else if (collision.gameObject.CompareTag("Finish"))
+            {
+                StartCoroutine(FinishRoutine());
+            }
         }
     }
 
     private IEnumerator CrashRoutine()
     {
+        isTransitioning = true;
         DisablePlayerMovement();
-        audioSource.PlayOneShot(AudioStorage.Instance.SFX_SpaceShip_Death);
+        PlaySoundEffect(AudioStorage.Instance.SFX_SpaceShip_Death);
         yield return new WaitForSeconds(LevelLoadDelay);
         LevelManager.ReloadLevel();
     }
 
     private IEnumerator FinishRoutine()
     {
+        isTransitioning = true;
         DisablePlayerMovement();
-        audioSource.PlayOneShot(AudioStorage.Instance.SFX_Finish);
+        PlaySoundEffect(AudioStorage.Instance.SFX_Finish);
         yield return new WaitForSeconds(LevelLoadDelay);
         LevelManager.ReloadLevel();
+    }
+
+    private void PlaySoundEffect(AudioClip clip)
+    {
+        audioSource.Stop();
+        audioSource.PlayOneShot(clip);
     }
 
     private void DisablePlayerMovement()

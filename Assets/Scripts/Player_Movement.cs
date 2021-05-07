@@ -38,11 +38,6 @@ public class Player_Movement : MonoBehaviour
         AddBoost();
     }
 
-    private void OnDisable()
-    {
-        audioSource.Stop();
-    }
-
     private void AddRotation()
     {
         rb.constraints = RigidbodyConstraints.FreezeRotationZ;
@@ -52,15 +47,14 @@ public class Player_Movement : MonoBehaviour
 
     private void AddBoost()
     {
-        AudioEffects();
+        BoostAudioEffect();
         if (jumpAxisValue != 0)
         {
             rb.AddRelativeForce(Vector3.up * jumpAxisValue * boost * Time.fixedDeltaTime);
         }
 
     }
-
-    private void AudioEffects()
+    private void BoostAudioEffect()
     {
         if (jumpAxisValue != 0)
         {
